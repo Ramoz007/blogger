@@ -11,4 +11,4 @@ CRUD methods
 
 Use it as a starting point for symfony.
 
-Components version needs to be checked, see composer.json
+Component versions needs to be verified with time, see composer.json
