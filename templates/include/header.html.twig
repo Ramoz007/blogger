@@ -10,14 +10,27 @@
                 <a class="nav-link" href="{{ path('home') }}">Home</a>
             </li>
             <li class="nav-item">
+                {% if is_granted('ROLE_USER') %}
+                    <a class="nav-link" href="{{ path('about') }}">My BlogPosts</a>
+                {% endif %}
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{{ path('create') }}">Create Post</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="{{ path('about') }}">
-                    About
-                </a>
+                {% if is_granted('ROLE_USER') %}
+                    <a class="nav-link" href="{{ path('app_logout') }}">(Logout)</a>
+                {% endif %}
+            </li>
+            <li class="nav-item">
+                {% if is_granted('ROLE_USER') == false %}
+                    <a class="nav-link" href="{{ path('app_login') }}">Login</a>
+                {% endif %}
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('about') }}">About</a>
             </li>
         </ul>
     </div>

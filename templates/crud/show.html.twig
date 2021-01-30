@@ -8,12 +8,13 @@
     <h3>Blog Post Content</h3>
     <hr>
     <h5>{{blog.title}}</h5>
-    <div><p style="color:green">User Must-Read Rating: {{blog.rates}}</p></div>
+    <div><p style="color:green">User Must-Read Rating: {{blog.rating}}</p></div>
     <p>{{blog.body}}</p>
     <hr>
-    <a href="{{ path('edit', {'id': blog.id}) }}"><button class="btn btn-warning">Edit</button></a>
-    <a href="{{ path('delete', {'id': blog.id}) }}"><button class="btn btn-danger">Delete</button></a>
-
+    {% if is_granted('ROLE_USER') %}
+        <a href="{{ path('edit', {'id': blog.id}) }}"><button class="btn btn-warning">Edit</button></a>
+        <a href="{{ path('delete', {'id': blog.id}) }}"><button class="btn btn-danger">Delete</button></a>
+    {% endif %}
 </div>
 
 {% endblock %}

@@ -1,6 +1,6 @@
 <?php
 namespace App\Service;
-use App\Entity\Blog;
+use App\Entity\BlogPost;
 
 class ModifyBlogJSON
 {
