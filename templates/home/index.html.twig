@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blogger | Home{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .like-on{
+            color: tomato;
+        }
+        .like-off{
+            color: grey;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center; 
+        }
+    </style>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container" style="padding-top:50px">
+    <h2>Welcome: Guest</h2>
+    <h3>All Posts</h3>
+    <hr>
+
+    <div class="d-flex flex-row flex-wrap">
+    {% if blogs %}
+        
+        {% for blog in blogs %}
+        <div class=".col-6 col-sm-12 col-md-6 col-xl-4">
+            <h5>{{blog.title}}</h5>
+            <div><p style="color:green">User Must-Read Rating: {{blog.rates}}</p></div>
+            <p>{{blog.body}}</p>
+            <div class="flex" style="padding-right:30px; display: flex; justify-content:space-between;">
+                <a href="{{ path('show', {'id': blog.id}) }}"><button class="btn btn-primary">View</button></a>
+                <div>
+                    <i style="font-size:25px;" onclick="myFunction(this)" class="fa fa-heart like-on"></i> 
+                    52 Likes
+                </div>
+            </div>
+            <hr>
+        </div>
+        {% endfor %}
+        
+    {% else %}
+        <div class="card p-1">
+            <h3>No Blogs!!!</h3>
+        </div>
+    {% endif %}
+    </div>
+</div>
+
+<script>
+    function myFunction(y) {
+        y.classList.toggle("like-off");
+    }
+    </script>
+
+{% endblock %}

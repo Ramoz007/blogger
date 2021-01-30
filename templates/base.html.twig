@@ -1,13 +1,38 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="" name="keywords">
+        <meta content="" name="description">
+
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Raleway:300,400,500,700,800|Montserrat:300,400,700" rel="stylesheet">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+        <!-- Libraries CSS Files -->
+        <link href= {{ asset('lib/font-awesome/css/font-awesome.min.css')}} rel="stylesheet">
+
+        <title>{% block title %}Blogger{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
 
-        {% block javascripts %}{% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        {{include('include/header.html.twig')}}
+        {% block body %}
+        
+        {% endblock %}
+
+        {% block javascripts %}
+            <!-- JavaScript Libraries -->
+            <script src= {{ asset('lib/jquery/jquery.min.js')}}></script>
+            <script src= {{ asset('lib/jquery/jquery-migrate.min.js')}}></script>
+            <script src= {{ asset('lib/bootstrap/js/bootstrap.bundle.min.js')}}></script>
+
+            <!-- Template Main Javascript File -->
+            <script src= {{ asset('js/main.js')}}></script>
+        {% endblock %}
     </body>
 </html>

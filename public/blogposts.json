@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "title": "Blog Title 1",
+        "body": "This is the body for this blog.",
+        "rates": 1
+    },
+    {
+        "id": 2,
+        "title": "Blog Title 2",
+        "body": "This is the body for this blog.",
+        "rates": 5
+    }
+]
