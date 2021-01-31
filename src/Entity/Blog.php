@@ -1,60 +1,93 @@
 <?php
 
 namespace App\Entity;
-use Symfony\Component\Validator\Constraints as Assert;
 
+use App\Repository\BlogRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass=BlogRepository::class)
+ */
 class Blog
 {
-    protected $id;
     /**
-     * @Assert\NotBlank
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
      */
-    protected $title;
-    /**
-     * @Assert\NotBlank
-     */
-    protected $body;
-    /**
-     * @Assert\NotBlank
-     */
-    protected $rates;
+    private $id;
 
-    //
-    public function getID(): int
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $title;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $body;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $rating;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $likes;
+
+    public function getId(): ?int
     {
         return $this->id;
     }
-    public function setID(string $id): void
-    {
-        $this->id = $id;
-    }
 
-    //
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
-    public function setTitle(string $title): void
+
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
+        return $this;
     }
 
-    //
-    public function getBody(): string
+    public function getBody(): ?string
     {
         return $this->body;
     }
-    public function setBody(string $body): void
+
+    public function setBody(?string $body): self
     {
         $this->body = $body;
+
+        return $this;
     }
-    //
-    public function getRates(): int
+
+    public function getRating(): ?string
     {
-        return $this->rates;
+        return $this->rating;
     }
-    public function setRates(string $rates): void
+
+    public function setRating(?string $rating): self
     {
-        $this->rates = $rates;
+        $this->rating = $rating;
+
+        return $this;
+    }
+
+    public function getLikes(): ?int
+    {
+        return $this->likes;
+    }
+
+    public function setLikes(?int $likes): self
+    {
+        $this->likes = $likes;
+
+        return $this;
     }
 }

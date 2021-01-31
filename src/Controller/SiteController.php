@@ -6,9 +6,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use App\Entity\Blog;
 use App\Form\Type\BlogType;
 use App\Service\ModifyBlogJSON;
+
+use App\Entity\Blog;
+use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class SiteController extends AbstractController
 {
@@ -17,7 +20,8 @@ class SiteController extends AbstractController
      */
     public function index(): Response
     {
-        $blogs = json_decode(file_get_contents("blogposts.json"), true);
+        $entityManager = $this->getDoctrine()->getManager();
+        $blogs = $entityManager->getRepository(Blog::class)->findAll();
 
         return $this->render('home/index.html.twig', ['blogs' => $blogs,]);
     }
@@ -27,54 +31,35 @@ class SiteController extends AbstractController
      */
     public function showblog($id)
     {
-        $blogs = json_decode(file_get_contents("blogposts.json"), true);
-        foreach($blogs as $bloggy){
-            if(intval($bloggy['id']) == $id){
-                $blog = $bloggy;
-            }
-        }
+        $blog = $this->getDoctrine()
+        ->getRepository(Blog::class)
+        ->find($id);
+
         return $this->render('crud/show.html.twig', ['blog' => $blog,]);
     }
 
     /**
      * @Route("/editblog/{id}", name="edit", methods={"GET","POST"})
+     * @IsGranted("ROLE_USER")
      */
     public function editblog($id, Request $request): Response
     {
-        $blogs = json_decode(file_get_contents("blogposts.json"), true);
-        foreach($blogs as $bloggy){
-            if(intval($bloggy['id']) == $id){
-                $blog_array = $bloggy;
-            }
-        }
+        $entityManager = $this->getDoctrine()->getManager();
+        $blog = $entityManager->getRepository(Blog::class)->find($id);
 
-        $blog = new Blog();
-        $blog->setTitle($blog_array["title"]);
-        $blog->setBody($blog_array["body"]);
-        $blog->setRates($blog_array["rates"]);
+        if (!$blog) {
+            throw $this->createNotFoundException(
+                'No blog found for id '.$id
+            );
+        }
 
         $form = $this->createForm(BlogType::class, $blog);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $blog_form_data = $form->getData();
-            $blogs = json_decode(file_get_contents("blogposts.json"), true);
+            $blog = $form->getData();
+            $entityManager->flush();
 
-            foreach($blogs as $bloggy){
-                if(intval($bloggy['id']) == $id){
-                    $pos = intval($id)-1;
-
-                    unset($blogs["$pos"]["title"]);
-                    unset($blogs["$pos"]["body"]);
-                    unset($blogs["$pos"]["rates"]);
-
-                    $blogs["$pos"]["title"] = $blog_form_data->getTitle();
-                    $blogs["$pos"]["body"] = $blog_form_data->getBody();
-                    $blogs["$pos"]["rates"] = $blog_form_data->getRates();
-
-                }
-            }
-            file_put_contents("blogposts.json",json_encode($blogs, JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK));
             return $this->redirectToRoute('home');
         }
         return $this->render('crud/edit.html.twig', ['form'=> $form->createView(), 'blog' => $blog,]);
@@ -82,57 +67,36 @@ class SiteController extends AbstractController
 
     /**
      * @Route("/deleteblog/{id}", name="delete", methods={"GET"})
+     * @IsGranted("ROLE_USER")
      */
     public function deleteblog($id): Response
     {
-        $blogs = json_decode(file_get_contents("blogposts.json"), true);
-        foreach($blogs as $bloggy){
-            if(intval($bloggy['id']) == $id){
-                unset($blogs[$id-1]);
-            }
-        }
-
-        //id must be decremented
-        $last_id_string = json_decode(file_get_contents('id_store.txt'), true);
-        $last_id = intval($last_id_string);
-        $last_id = $last_id - 1;
-
-        //update storages
-        file_put_contents("id_store.txt", $last_id);
-        file_put_contents("blogposts.json",json_encode($blogs));
+        $entityManager = $this->getDoctrine()->getManager();
+        $blog = $entityManager->getRepository(Blog::class)->find($id);
+        $entityManager->remove($blog);
+        $entityManager->flush();
 
         return $this->redirectToRoute('home');
     }
 
     /**
      * @Route("/createblog", name="create")
+     * @IsGranted("ROLE_USER")
      */
     public function createblog(Request $request, ModifyBlogJSON $modfiy_json): Response
     {
+        $entityManager = $this->getDoctrine()->getManager();
         $blog = new Blog();
+
         $form = $this->createForm(BlogType::class, $blog);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $blog = $form->getData();
+            
+            $entityManager->persist($blog);
+            $entityManager->flush();
 
-            //id must be incremented
-            $last_id_string = json_decode(file_get_contents('id_store.txt'), true);
-            $last_id = intval($last_id_string);
-            $last_id = $last_id + 1;
-
-            $new_blog_post = array('id'=>$last_id, 'title'=>$blog->getTitle(), 'body'=>$blog->getBody(), 'rates'=>$blog->getRates());
-            file_put_contents("id_store.txt", $last_id);
-
-            $blog_posts = json_decode(file_get_contents('blogposts.json'), true);
-            if($blog_posts != false){
-                array_push($blog_posts, $new_blog_post);
-                file_put_contents("blogposts.json",json_encode($blog_posts));
-            }
-            else{
-                $start_offset = "{\"0\":";
-                file_put_contents("blogposts.json", $start_offset.json_encode($new_blog_post)."}");
-            }
             return $this->redirectToRoute('home');
         }
         return $this->render('crud/create.html.twig', ['form'=> $form->createView(),]);
